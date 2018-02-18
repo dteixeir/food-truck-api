@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using api.DataLayer;
 using api.DataLayer.Interfaces;
 using api.Domain;
+using Microsoft.AspNetCore.Authorization;
 
 namespace api.Controllers
 {
@@ -14,11 +15,13 @@ namespace api.Controllers
   [Route("api/[controller]/")]
   public class UserController : Controller
   {
-    internal IService _manager;
+    internal IBaseManager _manager;
+    internal IApplicationDbContext _context;
 
-    public UserController(ApplicationDbContext context)
+    public UserController(IBaseManager _baseManager, ApplicationDbContext context)
     {
-      _manager = new BaseManager(context);
+      _manager = _baseManager;
+      _context = context;
     }
 
     // GET api/values

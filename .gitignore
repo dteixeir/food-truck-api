@@ -33,3 +33,7 @@ msbuild.wrn
 
 # Security
 **/appsettings.json
+
+
+# Scrap
+**/test.sql

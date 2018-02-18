@@ -14,7 +14,7 @@ namespace api.Controllers
   [Route("api/[controller]/")]
   public class MenuItemController : Controller
   {
-    internal IService _manager;
+    internal IBaseManager _manager;
 
     public MenuItemController(ApplicationDbContext context)
     {

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace api.Domain
 {
-  public class ApplicationDbContext : DbContext
+  public class ApplicationDbContext : DbContext, IApplicationDbContext
   {
     public DbSet<FoodTruck> FoodTrucks {get; set;}
 
@@ -20,20 +20,9 @@ namespace api.Domain
 
     }
 
-    // public DbSet<FoodTruck> FoodTrucks { get; set; }
-
-    // protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    // {
-    //     if (!optionsBuilder.IsConfigured)
-    //     {
-    //         #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-    //         optionsBuilder.UseSqlServer(@"Server=(localdb)\mssqllocaldb;Database=Blogging;Trusted_Connection=True;");
-    //     }
-    // }
-
-    // protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    // {
-    //   optionsBuilder.UseSql("Filename=./beer.db");
-    // }
+    protected override void OnModelCreating(ModelBuilder builder)
+    {
+       builder.Entity<User>().HasIndex(u => u.Username).IsUnique();
+    }
   }
 }

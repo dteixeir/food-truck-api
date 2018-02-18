@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using api.DataLayer;
 using api.DataLayer.Interfaces;
 using api.Domain;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace api.Controllers
 {
@@ -14,11 +16,11 @@ namespace api.Controllers
   [Route("api/[controller]/")]
   public class FoodTruckController : Controller
   {
-    internal IService _manager;
+    internal IBaseManager _manager;
 
-    public FoodTruckController(ApplicationDbContext context)
+    public FoodTruckController(ApplicationDbContext context, IBaseManager baseManager)
     {
-      _manager = new BaseManager(context);
+      _manager = baseManager;
     }
 
     // GET api/values
@@ -52,11 +54,16 @@ namespace api.Controllers
     }
 
     // POST api/values
-    [HttpPost]
+    [HttpPost, Authorize]
     public IActionResult Post([FromBody]FoodTruck entity)
     {
       try
       {
+        var currentUser = HttpContext.User;
+        // var user = currentUser.Claims.Select(c => new {type=c.Type,value=c.Value}).ToList();
+        var userId = currentUser.Claims.FirstOrDefault(c => c.Type == "User_Id")?.Value;
+        entity.CreateUserId = (new Guid(userId));
+        entity.CreateDateTime = DateTime.UtcNow;
         var result = _manager.Post<FoodTruck>(entity);
 
         return Created($"{Url.RouteUrl(RouteData.Values)}/{entity.Id}", entity);

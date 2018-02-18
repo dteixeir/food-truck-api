@@ -1,4 +1,6 @@
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Mvc;
 
 namespace api.Domain
 {
@@ -7,6 +9,8 @@ namespace api.Domain
     public string FirstName {get; set;}
 
     public string LastName {get; set;}
+
+    public string FullName {get; set;}
 
     public string Email {get; set;}
 

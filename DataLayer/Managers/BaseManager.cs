@@ -10,7 +10,7 @@ using api.DataLayer.Interfaces;
 
 namespace api.DataLayer
 {
-  public class BaseManager : IService  {
+  public class BaseManager : IBaseManager  {
     private ApplicationDbContext _context;
 
     public BaseManager(ApplicationDbContext context)
