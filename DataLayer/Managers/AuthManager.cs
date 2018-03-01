@@ -1,6 +1,6 @@
 using System;
 using System.Linq;
-
+using Microsoft.EntityFrameworkCore;
 using api.Domain;
 using api.DataLayer.Interfaces;
 using Microsoft.IdentityModel.Tokens;
@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
+using System.Threading.Tasks;
 
 namespace api.DataLayer
 {
@@ -24,8 +25,8 @@ namespace api.DataLayer
       _config = config;
     }
 
-    public string Authenticate(string username, string password) {
-      User user =  _context.Users.FirstOrDefault(x => x.Username == username);
+    public async Task<string> Authenticate(string username, string password) {
+      User user = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
 
       if(user == null ){
         throw new Exception("Invalid credentials");
@@ -34,14 +35,14 @@ namespace api.DataLayer
       return BCrypt.Verify(password, user?.Password) ? BuildToken(user) : null;
     }
 
-    public User Put(User entity) {
+    public async Task<User> Put(User entity) {
       _context.Users.Update(entity);
-      _context.SaveChanges();
+      await _context.SaveChangesAsync();
       return entity;
     }
 
-    public User Register(User entity) {
-      if(_context.Users.Any(x => x.Username == entity.Username)) {
+    public async Task<User> Register(User entity) {
+      if(await _context.Users.AnyAsync(x => x.Username == entity.Username)) {
         throw new Exception("Username is taken, please choose another one.");
       }
 
@@ -54,14 +55,17 @@ namespace api.DataLayer
 
     private string BuildToken(User user)
     {
+      // TODO: Build this out to fetch user infor from db based upon role
+
       var claims = new[] {
         new Claim(JwtRegisteredClaimNames.GivenName, user.FirstName),
         new Claim(JwtRegisteredClaimNames.FamilyName, user.LastName),
         new Claim(JwtRegisteredClaimNames.Email, user.Email),
         new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
         new Claim("User_Id", user.Id.ToString()),
-        new Claim("User_Email", user.Email)
-    };
+        new Claim("User_Email", user.Email),
+        new Claim("Role", "Admin")
+      };
 
       var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
       var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

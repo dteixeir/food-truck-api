@@ -9,10 +9,11 @@ using api.DataLayer.Interfaces;
 using api.Domain;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace api.Controllers
 {
-
+  [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
   [Route("api/[controller]/")]
   public class FoodTruckController : Controller
   {
