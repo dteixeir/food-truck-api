@@ -8,12 +8,24 @@ using TorrentApi.Repositories;
 
 namespace TorrentApi.Services
 {
-  public interface IService<TEntity> : IRepository<TEntity> where TEntity : BaseEntity
-  { }
+  public interface IService<TEntity> where TEntity : BaseEntity
+  {
+    void Include(string[] includes);
+    Task<TEntity> Add(TEntity item);
+    Task<List<TEntity>> Add(List<TEntity> item);
+    Task<Guid> Delete(Guid id);
+    Task<List<TEntity>> Get();
+    Task<TEntity> Get(Guid id);
+    Task<TEntity> Update(TEntity item);
+    Task<List<TEntity>> Update(List<TEntity> items);
+    DbSet<TEntity> DbSet();
+  }
 
   public class BaseService<TEntity> : IService<TEntity> where TEntity : BaseEntity
   {
     protected readonly IRepository<TEntity> _repository;
+    private readonly int _takeCount = 10;
+
 
     public BaseService(IRepository<TEntity> repository)
     {
@@ -22,14 +34,23 @@ namespace TorrentApi.Services
 
     public DbSet<TEntity> DbSet() => _repository.DbSet();
 
+    public void Include(string[] includes)
+    {
+      foreach (var include in includes)
+      {
+        DbSet().Include(include);
+      }
+    }
+
     // get
     public virtual async Task<List<TEntity>> Get()
     {
-      return await _repository.Get();
+      return await _repository.Get().ToListAsync();
     }
+
     public virtual async Task<TEntity> Get(Guid id)
     {
-      return await _repository.Get(id);
+      return await _repository.Get(id).FirstOrDefaultAsync();
     }
 
     // put

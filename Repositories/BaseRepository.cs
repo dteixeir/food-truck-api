@@ -9,11 +9,12 @@ namespace TorrentApi.Repositories
 {
   public interface IRepository<TEntity> where TEntity : BaseEntity
   {
+    // DbSet<TEntity> Include(string[] includes);
     Task<TEntity> Add(TEntity item);
     Task<List<TEntity>> Add(List<TEntity> item);
     Task<Guid> Delete(Guid id);
-    Task<List<TEntity>> Get();
-    Task<TEntity> Get(Guid id);
+    IQueryable<TEntity> Get();
+    IQueryable<TEntity> Get(Guid id);
     Task<TEntity> Update(TEntity item);
     Task<List<TEntity>> Update(List<TEntity> items);
     DbSet<TEntity> DbSet();
@@ -23,7 +24,6 @@ namespace TorrentApi.Repositories
   {
     private ApplicationDbContext _context;
     private readonly DbSet<TEntity> _dbSet;
-    private readonly int _takeCount = 10;
 
     public BaseRepository(ApplicationDbContext context)
     {
@@ -33,21 +33,21 @@ namespace TorrentApi.Repositories
 
     public DbSet<TEntity> DbSet() => _dbSet;
 
-    public async Task<List<TEntity>> Get()
+    public IQueryable<TEntity> Get()
     {
-      return await _dbSet.Take(_takeCount).ToListAsync();
+      return _dbSet.AsQueryable();
     }
 
-    public async Task<TEntity> Get(Guid id)
+    public IQueryable<TEntity> Get(Guid id)
     {
-      return await _dbSet.Where(x => x.Id == id).SingleAsync();
+      return _dbSet.Where(x => x.Id == id).AsQueryable();
     }
 
     public async Task<TEntity> Update(TEntity item)
     {
       _dbSet.Update(item);
       await _context.SaveChangesAsync();
-      
+
       return item;
     }
 
@@ -55,7 +55,7 @@ namespace TorrentApi.Repositories
     {
       _dbSet.UpdateRange(items);
       await _context.SaveChangesAsync();
-      
+
       return items;
     }
 
@@ -71,20 +71,11 @@ namespace TorrentApi.Repositories
     {
       await _dbSet.AddRangeAsync(items);
       await _context.SaveChangesAsync();
-      
+
       return items;
     }
 
     public async Task<Guid> Delete(Guid id)
-    {
-      TEntity item = await _dbSet.SingleOrDefaultAsync(x => x.Id == id);
-      _dbSet.Remove(item);
-      await _context.SaveChangesAsync();
-
-      return id;
-    }
-
-    public async Task<Guid> GetWhere(Guid id)
     {
       TEntity item = await _dbSet.SingleOrDefaultAsync(x => x.Id == id);
       _dbSet.Remove(item);

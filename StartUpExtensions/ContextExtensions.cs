@@ -2,8 +2,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using api.Domain;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json.Serialization;
-using Newtonsoft.Json;
 
 namespace TorrentApi.StartUpExtensions
 {
@@ -18,13 +16,7 @@ namespace TorrentApi.StartUpExtensions
           builder.AllowAnyOrigin()
                 .AllowAnyMethod()
                 .AllowAnyHeader();
-        }))
-        .AddMvc()
-        .AddJsonOptions(options =>
-        {
-          options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
-          options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-        });
+        }));
 
       return services;
     }
