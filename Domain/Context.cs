@@ -5,6 +5,8 @@ namespace api.Domain
 {
   public class ApplicationDbContext : DbContext, IApplicationDbContext
   {
+    public DbSet<Company> Companies {get; set;}
+
     public DbSet<FoodTruck> FoodTrucks {get; set;}
 
     public DbSet<Menu> Menus {get; set;}

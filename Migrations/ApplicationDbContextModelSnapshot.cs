@@ -20,7 +20,7 @@ namespace api.Migrations
                 .HasAnnotation("ProductVersion", "2.0.0-rtm-26452")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("api.Domain.FoodTruck", b =>
+            modelBuilder.Entity("api.Domain.Company", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
@@ -46,6 +46,38 @@ namespace api.Migrations
                     b.Property<string>("WebsiteUrl");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CreateUserId");
+
+                    b.HasIndex("UpdateUserId");
+
+                    b.ToTable("Companies");
+                });
+
+            modelBuilder.Entity("api.Domain.FoodTruck", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<Guid>("CompanyId");
+
+                    b.Property<DateTime>("CreateDateTime");
+
+                    b.Property<Guid>("CreateUserId");
+
+                    b.Property<bool>("IsActive");
+
+                    b.Property<bool>("IsDeleted");
+
+                    b.Property<string>("Name");
+
+                    b.Property<DateTime?>("UpdateDateTime");
+
+                    b.Property<Guid?>("UpdateUserId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CompanyId");
 
                     b.HasIndex("CreateUserId");
 
@@ -79,7 +111,8 @@ namespace api.Migrations
 
                     b.HasIndex("CreateUserId");
 
-                    b.HasIndex("FoodTruckId");
+                    b.HasIndex("FoodTruckId")
+                        .IsUnique();
 
                     b.HasIndex("UpdateUserId");
 
@@ -167,8 +200,6 @@ namespace api.Migrations
 
                     b.Property<string>("FirstName");
 
-                    b.Property<string>("FullName");
-
                     b.Property<bool>("IsActive");
 
                     b.Property<bool>("IsDeleted");
@@ -196,8 +227,25 @@ namespace api.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("api.Domain.Company", b =>
+                {
+                    b.HasOne("api.Domain.User", "CreateUser")
+                        .WithMany()
+                        .HasForeignKey("CreateUserId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("api.Domain.User", "UpdateUser")
+                        .WithMany()
+                        .HasForeignKey("UpdateUserId");
+                });
+
             modelBuilder.Entity("api.Domain.FoodTruck", b =>
                 {
+                    b.HasOne("api.Domain.Company", "Company")
+                        .WithMany("FoodTrucks")
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
                     b.HasOne("api.Domain.User", "CreateUser")
                         .WithMany()
                         .HasForeignKey("CreateUserId")
@@ -216,8 +264,8 @@ namespace api.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("api.Domain.FoodTruck", "FoodTruck")
-                        .WithMany("Menus")
-                        .HasForeignKey("FoodTruckId")
+                        .WithOne("Menu")
+                        .HasForeignKey("api.Domain.Menu", "FoodTruckId")
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("api.Domain.User", "UpdateUser")

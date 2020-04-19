@@ -1,8 +1,3 @@
-using System;
-using Microsoft.Extensions.PlatformAbstractions;
-using Microsoft.Extensions.Options;
-using Microsoft.AspNetCore.Hosting;
-
 namespace api.Migrations.MigrationLoader
 {
   public static class MigrationExtensions
